@@ -1,0 +1,93 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    	<RelativeLayout
+        	android:layout_width="0dp"
+        	android:layout_height="match_parent"
+        	android:layout_weight="0.5"
+        	android:background="#ffffff">
+        	
+    	    <FrameLayout
+    	    	android:layout_width="match_parent"
+            	android:layout_height="match_parent"
+            	android:id="@+id/camera_preview"
+            	android:adjustViewBounds="true"
+            	android:visibility="gone"
+            	/>
+        	<ImageView
+            	android:layout_width="match_parent"
+            	android:layout_height="match_parent"
+            	android:id="@+id/imgPreview"
+            	android:adjustViewBounds="true"
+            	android:visibility="gone"/>
+    	</RelativeLayout>
+    	<RelativeLayout
+        	android:layout_width="0dp"
+        	android:layout_height="match_parent"
+        	android:layout_weight="0.5"
+        	android:background="#000000">
+        	<FrameLayout
+    	    	android:layout_width="match_parent"
+            	android:layout_height="match_parent"
+            	android:id="@+id/camera_preview2"
+            	android:adjustViewBounds="true"
+            	/>
+        	<ImageView
+            	android:layout_width="match_parent"
+            	android:layout_height="match_parent"
+            	android:id="@+id/imgPreview2"
+            	android:adjustViewBounds="true"
+            	android:visibility="gone"/>
+    	    
+        </RelativeLayout>
+	</LinearLayout>
+    
+
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <!-- Capture picture button -->
+        <Button
+            android:id="@+id/btnCapturePicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Take a Picture"
+            android:layout_marginBottom="30dp"/>
+        <!-- Preview picture button -->
+        <Button
+            android:id="@+id/btnPreviewPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:text="Choose Photo"/>
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="0dp"
+            android:text="Confirm"
+            android:visibility="gone"/>
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:text="Cancel"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+</FrameLayout>
