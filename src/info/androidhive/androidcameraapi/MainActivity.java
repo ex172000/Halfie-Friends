@@ -1,13 +1,23 @@
 package info.androidhive.androidcameraapi;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Images.Media;
+import android.provider.SyncStateContract.Constants;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,15 +26,19 @@ import android.widget.ImageView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +51,7 @@ import android.widget.VideoView;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
@@ -65,6 +80,7 @@ public class MainActivity extends Activity {
 	private Button btnPreviewPicture;
 	private Button btnConfirm;
 	private Button btnCancel;
+	private Button btnSave;
 	private Button btnFCancel;
 	private Bitmap GBitmap;
 	private int side = 0;
@@ -135,6 +151,7 @@ public class MainActivity extends Activity {
 		btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
 		btnConfirm = (Button) findViewById(R.id.btnConfirm);
 		btnCancel = (Button) findViewById(R.id.btnCancel);
+		btnSave = (Button) findViewById(R.id.btnSave);
 		btnFCancel = (Button) findViewById(R.id.btnFCancel);
 		
 		cameraObject = isCameraAvailiable();
@@ -170,7 +187,7 @@ public class MainActivity extends Activity {
 				}
 				if (openornot == 0) {
 					preview.setVisibility(View.VISIBLE);
-					LinearLayout layer1 = (LinearLayout) findViewById(R.id.layer1);
+					//LinearLayout layer1 = (LinearLayout) findViewById(R.id.layer1);
 					RelativeLayout left1 = (RelativeLayout) findViewById(R.id.left1);
 					left1.setAlpha(0);
 					preview.setVisibility(View.GONE);
@@ -195,10 +212,10 @@ public class MainActivity extends Activity {
 				imgPreview = (ImageView) findViewById(R.id.imgPreview);
 				imgPreview.setVisibility(View.VISIBLE);
 				
-				FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-				preview.setVisibility(View.INVISIBLE);
+				//FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+				//preview.setVisibility(View.INVISIBLE);
 				
-				preview.removeViewAt(0);
+				//preview.removeViewAt(0);
 				side = 1;
 				
 				Intent i = new Intent(
@@ -206,10 +223,15 @@ public class MainActivity extends Activity {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
                 
-                FrameLayout preview2 = (FrameLayout) findViewById(R.id.camera_preview2);
-        	    preview2.addView(showCamera);
-        	    preview2.setVisibility(View.VISIBLE);
-        	    openornot = 1;
+                //FrameLayout preview2 = (FrameLayout) findViewById(R.id.camera_preview2);
+        	    //preview2.addView(showCamera);
+        	    //preview2.setVisibility(View.VISIBLE);
+                
+                
+                RelativeLayout right1 = (RelativeLayout) findViewById(R.id.right1);
+				right1.setAlpha(0);
+                
+                openornot = 1;
         	    btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
         	    btnPreviewPicture.setVisibility(View.GONE); 
 			}
@@ -245,9 +267,81 @@ public class MainActivity extends Activity {
 				// Return
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layer3);
         	    //preview.addView(showCamera);
+				
+			    int width = GBitmap.getWidth();
+			    int height = GBitmap.getHeight();
+			    Bitmap resizedBitmap;
+			    
+			    if (side == 1) {
+			    	 resizedBitmap = Bitmap.createBitmap(GBitmap, width/2, 0, 
+		                      width/2, height, null, false);
+			    } else {
+			    	 resizedBitmap = Bitmap.createBitmap(GBitmap, 0, 0, 
+		                      width/2, height, null, false);
+			    }
+			    
         	    layout.setVisibility(View.VISIBLE);
-        	    imgPreview3.setImageBitmap(GBitmap);
+        	    imgPreview3.setImageBitmap(resizedBitmap);
         	    
+			}
+		});
+		
+		btnSave.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String imageName = "BGS";                                                                                                                                                                                                                                                 
+				int width = GBitmap.getWidth();
+				int height = GBitmap.getHeight();
+				Bitmap resizedBitmap; 
+				    if (side == 1) {
+				    	 resizedBitmap = Bitmap.createBitmap(GBitmap, width/2, 0, 
+			                      width/2, height, null, false);
+				    } else {
+				    	 resizedBitmap = Bitmap.createBitmap(GBitmap, 0, 0, 
+			                      width/2, height, null, false);
+				    }
+				Bitmap sourceBitmap = resizedBitmap;                                                                                                                                                                                           
+				                                                                                                                                                                                                                                                                          
+				boolean imageSaved = false;                                                                                                                                                                                                                                               
+				                                                                                                                                                                                                                                                                          
+				if (sourceBitmap != null && !sourceBitmap.isRecycled()) {                                                                                                                                                                                                                 
+					File storagePath = new File(Environment.getExternalStorageDirectory() + "/MySpecialLocation/Pictures/");                                                                                                                                                                 
+					storagePath.mkdirs();                                                                                                                                                                                                                                                    
+				                                                                                                                                                                                                                                                                          
+					FileOutputStream out = null;                                                                                                                                                                                                                                             
+					File imageFile = new File(storagePath, String.format("%s.jpg",imageName));                                                                                                                                                                                               
+					try {                                                                                                                                                                                                                                                                   
+						out = new FileOutputStream(imageFile);                                                                                                                                                                                                                              
+						imageSaved = sourceBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);                                                                                                                                                                                            
+					} catch (Exception e) {                                                                                                                                                                                                                                                 
+				      //Log.e(Constants.LOG_TAG, "Unable to write the image to gallery", e);                                                                                                                                                                                                
+					} finally {                                                                                                                                                                                                                                                             
+						if (out != null) {                                                                                                                                                                                                                                                  
+							try {
+								out.flush();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}                                                                                                                                                                                                                                                    
+							try {
+								out.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}                                                                                                                                                                                                                                                    
+						}                                                                                                                                                                                                                                                                   
+					}                                                                                                                                                                                                                                                                       
+				                                                                                                                                                                                                                                                                          
+					ContentValues values = new ContentValues(3);                                                                                                                                                                                                                            
+					values.put(Images.Media.TITLE, imageName);                                                                                                                                                                                                                              
+					values.put(Images.Media.MIME_TYPE, "image/jpeg");                                                                                                                                                                                                                       
+					values.put("_data", imageFile.getAbsolutePath()) ;                                                                                                                                                                                                                      
+				                                                                                                                                                                                                                                                                          
+					getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);                                                                                                                                                                                                        
+					}                                                                                                                                                                                                                                                                    
+				                                                                                                                                                                                                                                                                          
+				  	//Toast.makeText(EnclosingActivity.this, String.format("Image %ssaved in Media Gallery...", imageSaved ? "" : "NOT "), Toast.LENGTH_SHORT).show();                                                                                                                                                  
 			}
 		});
 		
@@ -336,14 +430,15 @@ public class MainActivity extends Activity {
             imgPreview.setVisibility(View.VISIBLE);
 
 			// bimatp factory
-			BitmapFactory.Options options = new BitmapFactory.Options();
+			//BitmapFactory.Options options = new BitmapFactory.Options();
 
 			// downsizing image as it throws OutOfMemory Exception for larger
 			// images
-			options.inSampleSize = 8;
+			//options.inSampleSize = 8;
              
             //ImageView imageView = (ImageView) findViewById(R.id.imgPreview);
-            imgPreview.setImageBitmap(BitmapFactory.decodeFile(picturePath, options));
+            imgPreview.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            		//, options));
          
         }
 		
@@ -377,14 +472,14 @@ public class MainActivity extends Activity {
 			imgPreview.setVisibility(View.VISIBLE);
 
 			// bimatp factory
-			BitmapFactory.Options options = new BitmapFactory.Options();
+			//BitmapFactory.Options options = new BitmapFactory.Options();
 
 			// downsizing image as it throws OutOfMemory Exception for larger
 			// images
-			options.inSampleSize = 8;
+			//options.inSampleSize = 8;
 
-			final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
-					options);
+			final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath());
+					//options);
 
 			imgPreview.setImageBitmap(bitmap);
 		} catch (NullPointerException e) {
