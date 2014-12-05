@@ -30,6 +30,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -58,10 +60,13 @@ public class MainActivity extends Activity {
 	private Uri fileUri; // file url to store image/video
 
 	private ImageView imgPreview;
+	private ImageView imgPreview3;
 	private Button btnCapturePicture;
 	private Button btnPreviewPicture;
 	private Button btnConfirm;
 	private Button btnCancel;
+	private Button btnFCancel;
+	private Bitmap GBitmap;
 	private int side = 0;
 	private int openornot = 0;
 	
@@ -87,7 +92,7 @@ public class MainActivity extends Activity {
 	      public void onPictureTaken(byte[] data, Camera camera) {
 
 	      Bitmap bitmap = BitmapFactory.decodeByteArray(data , 0, data .length);
-	      
+	      GBitmap = bitmap;
 	      
 	      /*
 	      if(bitmap==null){
@@ -125,14 +130,16 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		imgPreview = (ImageView) findViewById(R.id.imgPreview);
+		imgPreview3 = (ImageView) findViewById(R.id.imgPreview3);
 		btnCapturePicture = (Button) findViewById(R.id.btnCapturePicture);
 		btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
 		btnConfirm = (Button) findViewById(R.id.btnConfirm);
 		btnCancel = (Button) findViewById(R.id.btnCancel);
+		btnFCancel = (Button) findViewById(R.id.btnFCancel);
 		
 		cameraObject = isCameraAvailiable();
 	    showCamera = new ShowCamera(this, cameraObject);
-	    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+	    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview4);
 	    preview.addView(showCamera);
 		
 		/*
@@ -163,10 +170,19 @@ public class MainActivity extends Activity {
 				}
 				if (openornot == 0) {
 					preview.setVisibility(View.VISIBLE);
+					LinearLayout layer1 = (LinearLayout) findViewById(R.id.layer1);
+					RelativeLayout left1 = (RelativeLayout) findViewById(R.id.left1);
+					left1.setAlpha(0);
+					preview.setVisibility(View.GONE);
+					imgPreview.setVisibility(View.GONE);
 					openornot = 1;
 				}
 				
 				btnPreviewPicture.setVisibility(View.GONE);
+				CharSequence text = Integer.toString(showCamera.bestSize.width);
+			    int duration = Toast.LENGTH_LONG;
+			    Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+			    toast.show();
 			}
 		});
 		
@@ -221,7 +237,20 @@ public class MainActivity extends Activity {
         	    
 			}
 		});
+		
+		btnConfirm.setOnClickListener(new View.OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				// Return
+				LinearLayout layout = (LinearLayout) findViewById(R.id.layer3);
+        	    //preview.addView(showCamera);
+        	    layout.setVisibility(View.VISIBLE);
+        	    imgPreview3.setImageBitmap(GBitmap);
+        	    
+			}
+		});
+		
 		// Checking camera availability
 		if (!isDeviceSupportCamera()) {
 			Toast.makeText(getApplicationContext(),

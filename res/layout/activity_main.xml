@@ -2,15 +2,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff">
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:id="@+id/layer0"
+        android:layout_height="match_parent">
+        <FrameLayout
+    	   	android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/camera_preview4"
+            android:adjustViewBounds="true"
+            />
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:id="@+id/layer1"
         android:layout_height="match_parent">
     	<RelativeLayout
         	android:layout_width="0dp"
         	android:layout_height="match_parent"
         	android:layout_weight="0.5"
+        	android:id="@+id/left1"
         	android:background="#ffffff">
         	
     	    <FrameLayout
@@ -46,9 +61,8 @@
             	android:visibility="gone"/>
     	    
         </RelativeLayout>
+	
 	</LinearLayout>
-    
-
     
     <RelativeLayout
         android:layout_width="match_parent"
@@ -89,5 +103,57 @@
             android:text="Cancel"
             android:visibility="gone"/>
     </RelativeLayout>
+    
+
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/layer3"
+        android:visibility="gone">
+    	<LinearLayout
+        	android:layout_width="match_parent"
+        	android:layout_height="match_parent"
+        	android:layout_weight="1"
+        	android:background="#ffffff">
+        	<ImageView
+            	android:layout_width="match_parent"
+            	android:layout_height="match_parent"
+            	android:id="@+id/imgPreview3"
+            	android:adjustViewBounds="true"
+            	/>
+    	</LinearLayout>
+    	<LinearLayout
+        	android:orientation="vertical"
+        	android:layout_width="fill_parent"
+        	android:layout_height="fill_parent"
+        	android:layout_weight="1">
+    		<LinearLayout
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+        		android:layout_weight="1"
+        		android:background="#00ff00">
+        		<Button
+            		android:id="@+id/btnSave"
+            		android:layout_width="match_parent"
+            		android:layout_height="match_parent"
+            		android:text="Save"
+            		/>
+        	</LinearLayout>
+			<LinearLayout
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+        		android:layout_weight="1"
+        		android:background="#ff0000">
+        		<Button
+            		android:id="@+id/btnFCancel"
+            		android:layout_width="match_parent"
+            		android:layout_height="match_parent"
+            		android:text="Cancel"
+            	/>
+        	</LinearLayout>	
+		</LinearLayout>	
+	</LinearLayout>
 
 </FrameLayout>
