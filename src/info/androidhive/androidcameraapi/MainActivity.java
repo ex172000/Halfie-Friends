@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -73,7 +74,7 @@ public class MainActivity extends Activity {
 	//private static final int REQ_CODE_PICK_IMAGE = 0;
 
 	private Uri fileUri; // file url to store image/video
-
+	private FrameLayout preview;
 	private ImageView imgPreview;
 	private ImageView imgPreview3;
 	private Button btnCapturePicture;
@@ -83,8 +84,11 @@ public class MainActivity extends Activity {
 	private Button btnSave;
 	private Button btnFCancel;
 	private Bitmap GBitmap;
+	private Bitmap LBitmap;
+	private Bitmap CBitmap;
 	private int side = 0;
 	private int openornot = 0;
+	private int captured  = 0;
 	
 	private static int RESULT_LOAD_IMAGE = 1;
 	
@@ -102,32 +106,27 @@ public class MainActivity extends Activity {
 	    return object; 
 	}
 	
-	private PictureCallback capturedIt = new PictureCallback() {
+	private PictureCallback CAPJPEG = new PictureCallback() {
 
 	      @Override
 	      public void onPictureTaken(byte[] data, Camera camera) {
-
-	      Bitmap bitmap = BitmapFactory.decodeByteArray(data , 0, data .length);
+	      BitmapFactory.Options options = new BitmapFactory.Options();
+		  options.inSampleSize = 1;
+	      Bitmap bitmap = BitmapFactory.decodeByteArray(data , 0, data.length, options);
 	      GBitmap = bitmap;
-	      
-	      /*
-	      if(bitmap==null){
-	         Toast.makeText(getApplicationContext(), "not taken", Toast.LENGTH_SHORT).show();
-	      }
-	      else
-	      {
-	         Toast.makeText(getApplicationContext(), "taken", Toast.LENGTH_SHORT).show();    	
-	      }*/
-	      
-	      //cameraObject.release();
-	      //imgPreview.setVisibility(View.VISIBLE);
-	      //imgPreview.setImageBitmap(bitmap);
 	      
 	   }
 	};
 	
 	   public void snapIt(View view){
-		      cameraObject.takePicture(null, null, capturedIt);
+		   Camera.AutoFocusCallback mAutoFocusCallback = new Camera.AutoFocusCallback() {
+			    @Override
+			    public void onAutoFocus(boolean success, Camera camera) {
+			        camera.takePicture(null, null, CAPJPEG);
+			    }
+			};   
+		        
+		   cameraObject.autoFocus(mAutoFocusCallback);
 	   }
 
 	   @Override
@@ -146,6 +145,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		imgPreview = (ImageView) findViewById(R.id.imgPreview);
+	    //imgPreview.setDrawingCacheEnabled(true);
 		imgPreview3 = (ImageView) findViewById(R.id.imgPreview3);
 		btnCapturePicture = (Button) findViewById(R.id.btnCapturePicture);
 		btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
@@ -156,8 +156,9 @@ public class MainActivity extends Activity {
 		
 		cameraObject = isCameraAvailiable();
 	    showCamera = new ShowCamera(this, cameraObject);
-	    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview4);
+	    preview = (FrameLayout) findViewById(R.id.camera_preview4);
 	    preview.addView(showCamera);
+	    //showCamera.setDrawingCacheEnabled(true);
 		
 		/*
 		 * Capture image button click event
@@ -178,8 +179,10 @@ public class MainActivity extends Activity {
 				if (openornot == 1) {
 					if (side == 0) {
 						snapIt(preview);
+						captured = 1;
 					} else if (side == 1) {
 						snapIt(preview2);
+						captured = 1;
 					}
 					btnCapturePicture.setVisibility(View.GONE);
 					btnConfirm.setVisibility(View.VISIBLE);
@@ -192,14 +195,11 @@ public class MainActivity extends Activity {
 					left1.setAlpha(0);
 					preview.setVisibility(View.GONE);
 					imgPreview.setVisibility(View.GONE);
+					btnCancel.setVisibility(View.VISIBLE);
 					openornot = 1;
 				}
 				
 				btnPreviewPicture.setVisibility(View.GONE);
-				CharSequence text = Integer.toString(showCamera.bestSize.width);
-			    int duration = Toast.LENGTH_LONG;
-			    Toast toast = Toast.makeText(getApplicationContext(), text, duration);
-			    toast.show();
 			}
 		});
 		
@@ -208,7 +208,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// capture picture
-				
+				btnCancel.setVisibility(View.VISIBLE);
 				imgPreview = (ImageView) findViewById(R.id.imgPreview);
 				imgPreview.setVisibility(View.VISIBLE);
 				
@@ -227,7 +227,6 @@ public class MainActivity extends Activity {
         	    //preview2.addView(showCamera);
         	    //preview2.setVisibility(View.VISIBLE);
                 
-                
                 RelativeLayout right1 = (RelativeLayout) findViewById(R.id.right1);
 				right1.setAlpha(0);
                 
@@ -241,22 +240,52 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// Return
-				FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        	    //preview.addView(showCamera);
-        	    preview.setVisibility(View.VISIBLE);
-        	    
-        	    showCamera.theCamera.startPreview();
-        	    
-        	    //btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
-				btnCapturePicture = (Button) findViewById(R.id.btnCapturePicture);
-				btnConfirm = (Button) findViewById(R.id.btnConfirm);
-				btnCancel = (Button) findViewById(R.id.btnCancel);
-				
-				btnCapturePicture.setVisibility(View.VISIBLE);
-				btnConfirm.setVisibility(View.GONE);
-				btnCancel.setVisibility(View.GONE);
-        	    
+				if (captured == 1) {
+					// Return
+					FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+	        	    //preview.addView(showCamera);
+	        	    preview.setVisibility(View.VISIBLE);
+	        	    
+	        	    showCamera.theCamera.startPreview();
+	        	    
+	        	    //btnPreviewPicture = (Button) findViewById(R.id.btnPreviewPicture);
+					btnCapturePicture = (Button) findViewById(R.id.btnCapturePicture);
+					btnConfirm = (Button) findViewById(R.id.btnConfirm);
+					btnCancel = (Button) findViewById(R.id.btnCancel);
+					
+					btnCapturePicture.setVisibility(View.VISIBLE);
+					btnConfirm.setVisibility(View.GONE);
+					btnCancel.setVisibility(View.GONE);
+				} else {
+					if (side == 0) {
+						preview.setVisibility(View.GONE);
+						//LinearLayout layer1 = (LinearLayout) findViewById(R.id.layer1);
+						RelativeLayout left1 = (RelativeLayout) findViewById(R.id.left1);
+						left1.setAlpha(1);
+						btnCapturePicture.setVisibility(View.VISIBLE);
+						btnPreviewPicture.setVisibility(View.VISIBLE);
+						btnConfirm.setVisibility(View.GONE);
+						//btnCancel.setVisibility(View.VISIBLE);
+						preview.setVisibility(View.VISIBLE);
+						imgPreview.setVisibility(View.VISIBLE);
+						btnCancel.setVisibility(View.GONE);
+						openornot = 0;
+					} else {
+						preview.setVisibility(View.GONE);
+						//LinearLayout layer1 = (LinearLayout) findViewById(R.id.layer1);
+						btnCapturePicture.setVisibility(View.VISIBLE);
+						btnPreviewPicture.setVisibility(View.VISIBLE);
+						btnConfirm.setVisibility(View.GONE);
+						//btnCancel.setVisibility(View.VISIBLE);
+						//preview.setVisibility(View.VISIBLE);
+						imgPreview.setVisibility(View.GONE);
+						btnCancel.setVisibility(View.GONE);
+						openornot = 0;
+						RelativeLayout right1 = (RelativeLayout) findViewById(R.id.right1);
+						right1.setAlpha(1);
+						showCamera.theCamera.startPreview();
+					}
+				}
 			}
 		});
 		
@@ -279,9 +308,15 @@ public class MainActivity extends Activity {
 			    	 resizedBitmap = Bitmap.createBitmap(GBitmap, 0, 0, 
 		                      width/2, height, null, false);
 			    }
+			    if (side == 1) {
+			    	CBitmap = combineImages(LBitmap, resizedBitmap);
+			    } else {
+			    	CBitmap = resizedBitmap;
+			    }
 			    
+			    //Bitmap bitmapx = Bitmap.createBitmap(showCamera.getDrawingCache());
         	    layout.setVisibility(View.VISIBLE);
-        	    imgPreview3.setImageBitmap(resizedBitmap);
+        	    imgPreview3.setImageBitmap(CBitmap);
         	    
 			}
 		});
@@ -290,21 +325,30 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				String imageName = "BGS";                                                                                                                                                                                                                                                 
-				int width = GBitmap.getWidth();
-				int height = GBitmap.getHeight();
-				Bitmap resizedBitmap; 
-				    if (side == 1) {
-				    	 resizedBitmap = Bitmap.createBitmap(GBitmap, width/2, 0, 
+				long unixTime = System.currentTimeMillis() / 1000L;
+				String imageName = Long.toString(unixTime);                                                                                                                                                                                                                                                 
+				int width = CBitmap.getWidth();
+				int height = CBitmap.getHeight();
+				
+				CharSequence text = Integer.toString(CBitmap.getWidth());
+			    int duration = Toast.LENGTH_LONG;
+			    Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+			    toast.show();
+				
+			    
+				//Bitmap resizedBitmap; 
+				   /* if (side == 1) {
+				    	 resizedBitmap = Bitmap.createBitmap(CBitmap, width/2, 0, 
 			                      width/2, height, null, false);
 				    } else {
-				    	 resizedBitmap = Bitmap.createBitmap(GBitmap, 0, 0, 
+				    	 resizedBitmap = Bitmap.createBitmap(CBitmap, 0, 0, 
 			                      width/2, height, null, false);
-				    }
-				Bitmap sourceBitmap = resizedBitmap;                                                                                                                                                                                           
-				                                                                                                                                                                                                                                                                          
-				boolean imageSaved = false;                                                                                                                                                                                                                                               
-				                                                                                                                                                                                                                                                                          
+				    }*/
+				
+				//Bitmap sourceBitmap = resizedBitmap;
+			    Bitmap sourceBitmap = CBitmap;
+				boolean imageSaved = false;
+				
 				if (sourceBitmap != null && !sourceBitmap.isRecycled()) {                                                                                                                                                                                                                 
 					File storagePath = new File(Environment.getExternalStorageDirectory() + "/MySpecialLocation/Pictures/");                                                                                                                                                                 
 					storagePath.mkdirs();                                                                                                                                                                                                                                                    
@@ -313,9 +357,9 @@ public class MainActivity extends Activity {
 					File imageFile = new File(storagePath, String.format("%s.jpg",imageName));                                                                                                                                                                                               
 					try {                                                                                                                                                                                                                                                                   
 						out = new FileOutputStream(imageFile);                                                                                                                                                                                                                              
-						imageSaved = sourceBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);                                                                                                                                                                                            
+						imageSaved = sourceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);                                                                                                                                                                                            
 					} catch (Exception e) {                                                                                                                                                                                                                                                 
-				      //Log.e(Constants.LOG_TAG, "Unable to write the image to gallery", e);                                                                                                                                                                                                
+				        //Log.e(Constants.LOG_TAG, "Unable to write the image to gallery", e);                                                                                                                                                                                                
 					} finally {                                                                                                                                                                                                                                                             
 						if (out != null) {                                                                                                                                                                                                                                                  
 							try {
@@ -333,12 +377,12 @@ public class MainActivity extends Activity {
 						}                                                                                                                                                                                                                                                                   
 					}                                                                                                                                                                                                                                                                       
 				                                                                                                                                                                                                                                                                          
-					ContentValues values = new ContentValues(3);                                                                                                                                                                                                                            
-					values.put(Images.Media.TITLE, imageName);                                                                                                                                                                                                                              
-					values.put(Images.Media.MIME_TYPE, "image/jpeg");                                                                                                                                                                                                                       
-					values.put("_data", imageFile.getAbsolutePath()) ;                                                                                                                                                                                                                      
-				                                                                                                                                                                                                                                                                          
-					getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);                                                                                                                                                                                                        
+					//ContentValues values = new ContentValues(3);                                                                                                                                                                                                                            
+					//values.put(Images.Media.TITLE, imageName);                                                                                                                                                                                                                              
+					//values.put(Images.Media.MIME_TYPE, "image/jpeg");                                                                                                                                                                                                                       
+					//values.put("_data", imageFile.getAbsolutePath()) ;                                                                                                                                                                                                                      
+					galleryAddPic(imageFile.getAbsolutePath());                                                                                                                                                                                                                                                                    
+					//getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);                                                                                                                                                                                                        
 					}                                                                                                                                                                                                                                                                    
 				                                                                                                                                                                                                                                                                          
 				  	//Toast.makeText(EnclosingActivity.this, String.format("Image %ssaved in Media Gallery...", imageSaved ? "" : "NOT "), Toast.LENGTH_SHORT).show();                                                                                                                                                  
@@ -354,7 +398,37 @@ public class MainActivity extends Activity {
 			finish();
 		}
 	}
+	
+	public Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom 
+	    Bitmap cs = null; 
 
+	    int width, height = 0; 
+
+	    if(c.getWidth() > s.getWidth()) { 
+	      width = c.getWidth() + s.getWidth(); 
+	      height = c.getHeight(); 
+	    } else { 
+	      width = s.getWidth() + s.getWidth(); 
+	      height = c.getHeight(); 
+	    } 
+
+	    cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
+
+	    Canvas comboImage = new Canvas(cs); 
+
+	    comboImage.drawBitmap(c, 0f, 0f, null); 
+	    comboImage.drawBitmap(s, c.getWidth(), 0f, null); 
+
+	    return cs; 
+	  } 
+	
+	private void galleryAddPic(String mCurrentPhotoPath) {
+	    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+	    File f = new File(mCurrentPhotoPath);
+	    Uri contentUri = Uri.fromFile(f);
+	    mediaScanIntent.setData(contentUri);
+	    this.sendBroadcast(mediaScanIntent);
+	}
 	/**
 	 * Checking device has camera hardware or not
 	 * */
@@ -437,7 +511,9 @@ public class MainActivity extends Activity {
 			//options.inSampleSize = 8;
              
             //ImageView imageView = (ImageView) findViewById(R.id.imgPreview);
-            imgPreview.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            LBitmap = BitmapFactory.decodeFile(picturePath);
+            
+            imgPreview.setImageBitmap(LBitmap);
             		//, options));
          
         }

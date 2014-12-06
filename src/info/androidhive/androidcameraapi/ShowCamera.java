@@ -13,28 +13,18 @@ public class ShowCamera extends SurfaceView implements SurfaceHolder.Callback {
 
    public SurfaceHolder holdMe;
    public Camera theCamera;
-   public Camera.Size bestSize;
+   //public Camera.Size bestSize;
 
    public ShowCamera(Context context,Camera camera) {
       super(context);
       theCamera = camera;
       Camera.Parameters mParameters = theCamera.getParameters();
       
-      bestSize = null;
-      List<Camera.Size> sizeList = theCamera.getParameters().getSupportedPreviewSizes();
-      
-      bestSize = getOptimalPreviewSize(sizeList, 1536, 2048);
-      
-      
-      CharSequence text = Integer.toString(bestSize.height) +"x"+ Integer.toString(bestSize.width);
-      int duration = Toast.LENGTH_LONG;
-      Toast toast = Toast.makeText(context, text, duration);
-      
-      toast.show();
-      
-      mParameters.setPreviewSize(bestSize.width, bestSize.height);
+      mParameters.setPreviewSize(2048, 1536);
+      mParameters.setPictureSize(2048, 1536);
       theCamera.setParameters(mParameters);
       theCamera.setDisplayOrientation(0);
+      //theCamera.setPicture = 2048;
       holdMe = getHolder();
       holdMe.addCallback(this);
    }
