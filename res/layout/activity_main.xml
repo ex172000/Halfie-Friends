@@ -26,15 +26,41 @@
         	android:layout_height="match_parent"
         	android:layout_weight="0.5"
         	android:id="@+id/left1"
-        	android:background="#ffffff">
-        	
+        	android:background="@drawable/back_left">
+        	<LinearLayout
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+        		android:gravity="center"
+        		android:orientation="vertical" >
+        		<Button
+            		android:id="@+id/sun"
+            		android:layout_width="122dp"
+            		android:layout_height="122dp"
+            		android:layout_marginTop="60dp"
+            		android:layout_marginRight="40dp"
+            		android:background="@drawable/sun"
+            		android:layout_marginBottom="100dp"/>
+        	</LinearLayout>
+        	<LinearLayout
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+        		android:gravity="center"
+        		android:orientation="vertical" >
+        		<Button
+            		android:id="@+id/hmm"
+            		android:layout_width="157dp"
+            		android:layout_height="117dp"
+            		android:layout_marginTop="45dp"
+            		android:layout_marginLeft="20dp"
+            		android:background="@drawable/hmm"
+            		android:layout_marginBottom="0dp"/>
+        	</LinearLayout>
     	    <FrameLayout
     	    	android:layout_width="match_parent"
             	android:layout_height="match_parent"
             	android:id="@+id/camera_preview"
             	android:adjustViewBounds="true"
-            	android:visibility="gone"
-            	/>
+            	android:visibility="gone"/>
         	<ImageView
             	android:layout_width="match_parent"
             	android:layout_height="match_parent"
@@ -47,25 +73,21 @@
         	android:layout_height="match_parent"
         	android:layout_weight="0.5"
         	android:id="@+id/right1"
-        	android:background="#000000">
+        	android:background="@drawable/back_right">
         	<FrameLayout
     	    	android:layout_width="match_parent"
             	android:layout_height="match_parent"
             	android:id="@+id/camera_preview2"
-            	android:adjustViewBounds="true"
-            	/>
+            	android:adjustViewBounds="true"/>
         	<ImageView
             	android:layout_width="match_parent"
             	android:layout_height="match_parent"
             	android:id="@+id/imgPreview2"
             	android:adjustViewBounds="true"
             	android:visibility="gone"/>
-    	    
         </RelativeLayout>
-	
 	</LinearLayout>
-    
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -74,36 +96,37 @@
         <!-- Capture picture button -->
         <Button
             android:id="@+id/btnCapturePicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="124dp"
+            android:layout_height="124dp"
             android:layout_centerHorizontal="true"
-            android:text="Take a Picture"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginTop="0dp"
+            android:background="@drawable/take_pic"
+            android:layout_marginBottom="0dp"/>
         <!-- Preview picture button -->
         <Button
             android:id="@+id/btnPreviewPicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="124dp"
+            android:layout_height="124dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="60dp"
-            android:text="Choose Photo"/>
+            android:layout_marginTop="40dp"
+            android:background="@drawable/choose_pic"/>
         <Button
             android:id="@+id/btnConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="124dp"
+            android:layout_height="124dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
-            android:text="Confirm"
+            android:background="@drawable/save"
             android:visibility="gone"/>
         <Button
             android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="124dp"
+            android:layout_height="67dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="200dp"
-            android:text="Cancel"
+            android:layout_marginTop="-300dp"
+            android:background="@drawable/back"
             android:visibility="gone"/>
-    </RelativeLayout>
+    </LinearLayout>
     
 
     
